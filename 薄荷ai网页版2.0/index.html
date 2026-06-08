@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>薄荷AI - 智慧随行</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Segoe UI", "Microsoft YaHei", sans-serif;
+        }
+        body {
+            min-height: 100vh;
+            background: radial-gradient(circle at top left, #1a2a4a, #0c1423);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            overflow-x: hidden;
+            position: relative;
+        }
+        /* 背景粒子效果 */
+        .bg-particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: rgba(92, 225, 230, 0.6);
+            border-radius: 50%;
+            box-shadow: 0 0 10px rgba(92, 225, 230, 0.8);
+            opacity: 0;
+            animation: floatParticle 15s infinite linear;
+        }
+        @keyframes floatParticle {
+            0% {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0;
+            }
+            15% { opacity: 0.7; }
+            85% { opacity: 0.7; }
+            100% {
+                transform: translateY(-20vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+        /* 主卡片 */
+        .card {
+            background: rgba(20, 35, 65, 0.7);
+            backdrop-filter: blur(20px);
+            border-radius: 28px;
+            padding: 50px 40px;
+            max-width: 520px;
+            width: 100%;
+            text-align: center;
+            border: 1px solid rgba(92, 225, 230, 0.3);
+            box-shadow: 0 25px 80px rgba(0, 0, 0, 0.4);
+            animation: fadeIn 0.8s ease forwards, cardGlow 3s infinite alternate;
+            position: relative;
+            z-index: 1;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes cardGlow {
+            0% { box-shadow: 0 25px 80px rgba(0, 0, 0, 0.4), 0 0 0 0 rgba(92, 225, 230, 0.2); }
+            100% { box-shadow: 0 25px 80px rgba(0, 0, 0, 0.4), 0 0 30px 10px rgba(92, 225, 230, 0.15); }
+        }
+        /* 头像区域 */
+        .avatar {
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            margin: 0 auto 24px;
+            overflow: hidden;
+            border: 4px solid #5ce1e6;
+            box-shadow: 0 0 30px #5ce1e6;
+            animation: avatarPulse 2.5s infinite ease-in-out;
+        }
+        .avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        @keyframes avatarPulse {
+            0%, 100% { box-shadow: 0 0 30px #5ce1e6; }
+            50% { box-shadow: 0 0 50px #5ce1e6, 0 0 70px rgba(92, 225, 230, 0.3); }
+        }
+        /* 标题文字 */
+        .title {
+            font-size: 42px;
+            font-weight: 700;
+            background: linear-gradient(90deg, #93e7f7, #5ce1e6, #21d5fd);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            font-size: 16px;
+            color: #bdd9ff;
+            margin-bottom: 44px;
+            line-height: 1.6;
+        }
+        /* 底部娱乐提示小字 */
+        .tips-text {
+            margin-top: 30px;
+            font-size: 13px;
+            color: #a0aec0;
+        }
+        /* 按钮组 */
+        .btn-group {
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+        .btn {
+            padding: 18px 24px;
+            border-radius: 18px;
+            font-size: 17px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            position: relative;
+            overflow: hidden;
+            letter-spacing: 1px;
+        }
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+            transition: left 0.6s ease;
+        }
+        .btn:hover::before {
+            left: 100%;
+        }
+        .btn-web {
+            background: linear-gradient(90deg, #21d5fd, #5ce1e6);
+            color: #0c1423;
+            box-shadow: 0 8px 25px rgba(92, 225, 230, 0.3);
+        }
+        .btn-download, .btn-gov, .btn-code {
+            background: rgba(30, 50, 90, 0.6);
+            color: #93e7f7;
+            border: 1px solid #5ce1e6;
+        }
+        /* 安魂曲写真 红色调按钮 */
+        .btn-pic {
+            background: rgba(90, 30, 40, 0.6);
+            color: #ffb4b4;
+            border: 1px solid #ff6b6b;
+        }
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(92, 225, 230, 0.35);
+        }
+        /* 通用弹窗样式 */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 999;
+            animation: modalShow 0.3s ease;
+        }
+        .modal.show {
+            display: flex;
+        }
+        @keyframes modalShow {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .modal-content {
+            background: rgba(20, 35, 65, 0.9);
+            backdrop-filter: blur(25px);
+            border-radius: 24px;
+            padding: 36px 30px;
+            width: 90%;
+            max-width: 460px;
+            border: 1px solid rgba(92, 225, 230, 0.4);
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+        }
+        .modal-title {
+            font-size: 22px;
+            color: #93e7f7;
+            margin-bottom: 22px;
+            font-weight: 600;
+        }
+        .link-area {
+            background: rgba(12, 20, 35, 0.8);
+            border: 1px solid #5ce1e6;
+            border-radius: 14px;
+            padding: 16px;
+            color: #fff;
+            font-size: 15px;
+            word-break: break-all;
+            margin-bottom: 20px;
+            user-select: all;
+            line-height: 1.8;
+        }
+        .copy-btn {
+            padding: 12px 24px;
+            background: #5ce1e6;
+            color: #0c1423;
+            border-radius: 12px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .copy-btn:hover {
+            background: #21d5fd;
+        }
+        .copy-btn.copied {
+            background: #22c55e;
+        }
+        .close {
+            margin-top: 14px;
+            color: #94a3b8;
+            cursor: pointer;
+            font-size: 14px;
+            transition: 0.2s;
+        }
+        .close:hover {
+            color: #fff;
+        }
+        /* 响应式适配 */
+        @media (max-width: 480px) {
+            .card {
+                padding: 35px 25px;
+            }
+            .title {
+                font-size: 32px;
+            }
+            .avatar {
+                width: 120px;
+                height: 120px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 背景粒子 -->
+    <div class="bg-particles" id="particles"></div>
+    <div class="card">
+        <div class="avatar">
+            <img src="IMG_9405.JPG" alt="薄荷AI">
+        </div>
+        <h1 class="title">薄荷AI</h1>
+        <p class="subtitle">你的专属智能助手 · 智慧 · 治愈 · 高效</p>
+        <div class="btn-group">
+            <button class="btn btn-web" id="toWeb">立即体验网页版</button>
+            <button class="btn btn-download" id="openDownload">薄荷AI 下载</button>
+            <button class="btn btn-gov" id="toHtlGov">海特洛市市政府官网</button>
+            <button class="btn btn-code" id="openCode">最新兑换码</button>
+            <button class="btn btn-pic" id="openPic">安魂曲写真</button>
+        </div>
+        <!-- 网站底部小字 -->
+        <p class="tips-text">本网站仅供娱乐</p>
+    </div>
+    <!-- 下载链接弹窗 -->
+    <div class="modal" id="downloadModal">
+        <div class="modal-content">
+            <h3 class="modal-title">薄荷AI 下载链接百度网盘下载</h3>
+            <div class="link-area" id="linkText">链接加载中...</div>
+            <button class="copy-btn" id="copyBtn">复制链接</button>
+            <div class="close" id="closeModal">关闭</div>
+        </div>
+    </div>
+    <!-- 兑换码弹窗 -->
+    <div class="modal" id="codeModal">
+        <div class="modal-content">
+            <h3 class="modal-title">最新游戏兑换码（400环石兑换码）</h3>
+            <div class="link-area" id="codeText">
+HUILANG0528<br>
+TOMATO100<br>
+YHDOUYIN0528<br>
+587561296HIGDFWB<br>
+RACENOLIMIT
+            </div>
+            <button class="copy-btn" id="copyCodeBtn">复制兑换码</button>
+            <div class="close" id="closeCodeModal">关闭</div>
+        </div>
+    </div>
+
+    <script>
+        // 配置内容
+        const DOWNLOAD_LINK = "通过网盘分享的文件：薄荷AI安装包.exe链接: https://pan.baidu.com/s/13BqKizERjOy0pvdF7wU_og?pwd=fdai 提取码: fdai --来自百度网盘超级会员v1的分享";
+        // 同步弹窗内全部兑换码
+        const GAME_CODE = "HUILANG0528\nTOMATO100\nYHDOUYIN0528\n587561296HIGDFWB\nRACENOLIMIT";
+
+        // 初始化背景粒子
+        function initParticles() {
+            const container = document.getElementById('particles');
+            for (let i = 0; i < 50; i++) {
+                const p = document.createElement('div');
+                p.classList.add('particle');
+                p.style.left = Math.random() * 100 + '%';
+                p.style.animationDuration = 10 + Math.random() * 10 + 's';
+                p.style.animationDelay = Math.random() * 15 + 's';
+                container.appendChild(p);
+            }
+        }
+        initParticles();
+
+        // 跳转网页版
+        document.getElementById("toWeb").onclick = function () {
+            window.location.href = "薄荷AI网页版.html";
+        };
+        // 跳转海特洛市官网
+        document.getElementById("toHtlGov").onclick = function () {
+            window.open("https://www.htlgov.com", "_blank");
+        };
+
+        // ========== 下载弹窗逻辑 ==========
+        const downloadModal = document.getElementById("downloadModal");
+        const linkBox = document.getElementById("linkText");
+        const copyBtn = document.getElementById("copyBtn");
+        document.getElementById("openDownload").onclick = function () {
+            linkBox.innerText = DOWNLOAD_LINK;
+            downloadModal.classList.add("show");
+            copyBtn.classList.remove("copied");
+            copyBtn.innerText = "复制链接";
+        };
+        document.getElementById("copyBtn").onclick = function () {
+            navigator.clipboard.writeText(DOWNLOAD_LINK).then(() => {
+                this.innerText = "复制成功 ✓";
+                this.classList.add("copied");
+                setTimeout(() => {
+                    this.innerText = "复制链接";
+                    this.classList.remove("copied");
+                }, 1500);
+            });
+        };
+        document.getElementById("closeModal").onclick = function () {
+            downloadModal.classList.remove("show");
+        };
+
+        // ========== 兑换码弹窗逻辑 ==========
+        const codeModal = document.getElementById("codeModal");
+        const copyCodeBtn = document.getElementById("copyCodeBtn");
+        document.getElementById("openCode").onclick = function () {
+            codeModal.classList.add("show");
+            copyCodeBtn.classList.remove("copied");
+            copyCodeBtn.innerText = "复制兑换码";
+        };
+        document.getElementById("copyCodeBtn").onclick = function () {
+            navigator.clipboard.writeText(GAME_CODE).then(() => {
+                this.innerText = "复制成功 ✓";
+                this.classList.add("copied");
+                setTimeout(() => {
+                    this.innerText = "复制兑换码";
+                    this.classList.remove("copied");
+                }, 1500);
+            });
+        };
+        document.getElementById("closeCodeModal").onclick = function () {
+            codeModal.classList.remove("show");
+        };
+
+        // ========== 安魂曲写真按钮 弹出提示 ==========
+        document.getElementById("openPic").onclick = function () {
+            alert("你认真的吗 鉴定师");
+        };
+    </script>
+</body>
+</html>

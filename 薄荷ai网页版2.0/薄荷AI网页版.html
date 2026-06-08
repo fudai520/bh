@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>薄荷AI · 智愈你的每一刻</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Inter', 'Segoe UI', sans-serif;
+            background: radial-gradient(circle at 10% 20%, rgba(10, 25, 47, 0.95), #071426);
+            min-height: 100vh;
+            color: #ffffff;
+            overflow: hidden;
+            position: relative;
+        }
+        .bg-aura {
+            position: fixed;
+            top: -40%;
+            left: -20%;
+            width: 140%;
+            height: 140%;
+            background: radial-gradient(ellipse at 30% 40%, rgba(79, 195, 247, 0.12), transparent 70%);
+            pointer-events: none;
+            z-index: 0;
+            animation: slowDrift 24s infinite alternate;
+        }
+        @keyframes slowDrift {
+            0% { transform: translate(0, 0) scale(1); opacity: 0.6; }
+            100% { transform: translate(5%, 3%) scale(1.08); opacity: 1; }
+        }
+        .bg-particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+        .particle {
+            position: absolute;
+            background: rgba(79, 195, 247, 0.5);
+            border-radius: 50%;
+            box-shadow: 0 0 6px #4fc3f7;
+            opacity: 0;
+            animation: floatParticle 18s infinite linear;
+        }
+        @keyframes floatParticle {
+            0% {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0;
+            }
+            15% { opacity: 0.5; }
+            85% { opacity: 0.4; }
+            100% {
+                transform: translateY(-20vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+        .app-wrapper {
+            position: relative;
+            z-index: 2;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            overflow: hidden;
+            backdrop-filter: blur(2px);
+        }
+        .sidebar {
+            width: 290px;
+            background: rgba(15, 35, 55, 0.55);
+            backdrop-filter: blur(24px);
+            border-right: 1px solid rgba(79, 195, 247, 0.25);
+            padding: 28px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 36px;
+            transition: all 0.25s;
+        }
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(79, 195, 247, 0.3);
+        }
+        .logo-icon {
+            width: 52px;
+            height: 52px;
+            border-radius: 18px;
+            overflow: hidden;
+            border: 2px solid #4fc3f7;
+        }
+        .logo-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .logo-text {
+            font-size: 26px;
+            font-weight: 700;
+            background: linear-gradient(130deg, #b9f6ff, #4fc3f7, #81d4fa);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            letter-spacing: -0.3px;
+        }
+        .nav-menu {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 12px 18px;
+            border-radius: 20px;
+            font-weight: 500;
+            color: rgba(220, 240, 255, 0.75);
+            transition: all 0.25s;
+            cursor: pointer;
+            backdrop-filter: blur(4px);
+        }
+        .nav-item i {
+            width: 24px;
+            font-size: 1.25rem;
+        }
+        .nav-item.active, .nav-item:hover {
+            background: rgba(79, 195, 247, 0.2);
+            color: #e1f5fe;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            border-left: 2px solid #4fc3f7;
+        }
+        .main-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
+        .top-header {
+            background: rgba(10, 25, 47, 0.55);
+            backdrop-filter: blur(20px);
+            padding: 16px 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(79, 195, 247, 0.2);
+        }
+        .header-title {
+            font-size: 1.35rem;
+            font-weight: 600;
+            background: linear-gradient(120deg, #e0f7fa, #80deea);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        .badge-mint {
+            background: rgba(79, 195, 247, 0.18);
+            border-radius: 40px;
+            padding: 6px 14px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: #b3e5fc;
+            border: 0.5px solid rgba(79, 195, 247, 0.5);
+        }
+        .chat-core {
+            flex: 1;
+            overflow-y: auto;
+            padding: 28px 28px 20px 28px;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+            scroll-behavior: smooth;
+        }
+        .chat-core::-webkit-scrollbar {
+            width: 5px;
+        }
+        .chat-core::-webkit-scrollbar-track {
+            background: rgba(255,255,255,0.05);
+            border-radius: 10px;
+        }
+        .chat-core::-webkit-scrollbar-thumb {
+            background: #4fc3f7;
+            border-radius: 10px;
+        }
+        .message-row {
+            display: flex;
+            gap: 14px;
+            animation: fadeSlideUp 0.3s ease;
+        }
+        @keyframes fadeSlideUp {
+            from { opacity: 0; transform: translateY(14px);}
+            to { opacity: 1; transform: translateY(0);}
+        }
+        .message-row.ai {
+            justify-content: flex-start;
+        }
+        .message-row.user {
+            justify-content: flex-end;
+        }
+        .avatar-mint {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 2px solid #4fc3f7;
+        }
+        .avatar-mint img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .bubble {
+            max-width: 70%;
+            padding: 14px 20px;
+            border-radius: 24px;
+            line-height: 1.5;
+            font-size: 0.95rem;
+            font-weight: 400;
+            backdrop-filter: blur(8px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+        .ai .bubble {
+            background: rgba(25, 55, 85, 0.7);
+            border: 1px solid rgba(79, 195, 247, 0.4);
+            border-bottom-left-radius: 6px;
+            color: #f0f9ff;
+        }
+        .user .bubble {
+            background: linear-gradient(125deg, #2c7da0, #1f6390);
+            border-bottom-right-radius: 6px;
+            color: white;
+            box-shadow: 0 6px 14px rgba(0, 160, 200, 0.25);
+        }
+        .input-section {
+            background: rgba(10, 25, 47, 0.7);
+            backdrop-filter: blur(24px);
+            border-top: 1px solid rgba(79, 195, 247, 0.3);
+            padding: 20px 28px 28px;
+        }
+        .input-wrapper {
+            background: rgba(0, 20, 40, 0.6);
+            border-radius: 32px;
+            border: 1px solid rgba(79, 195, 247, 0.5);
+            display: flex;
+            align-items: flex-end;
+            padding: 8px 12px 8px 22px;
+            transition: all 0.2s;
+        }
+        .input-wrapper:focus-within {
+            border-color: #4fc3f7;
+            box-shadow: 0 0 14px rgba(79, 195, 247, 0.3);
+        }
+        .message-input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            padding: 12px 0;
+            color: white;
+            font-size: 0.95rem;
+            resize: none;
+            font-family: 'Inter', monospace;
+            outline: none;
+            max-height: 120px;
+        }
+        .message-input::placeholder {
+            color: #8bb9d0;
+            font-weight: 400;
+        }
+        .send-button {
+            background: linear-gradient(135deg, #4fc3f7, #0288d1);
+            border: none;
+            width: 44px;
+            height: 44px;
+            border-radius: 28px;
+            color: white;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-left: 8px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+        .send-button:hover {
+            transform: scale(1.02);
+            background: linear-gradient(135deg, #64d8ff, #039be5);
+            box-shadow: 0 0 12px #4fc3f7;
+        }
+        .quick-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 12px;
+            padding-left: 8px;
+        }
+        .chip {
+            background: rgba(79, 195, 247, 0.12);
+            border-radius: 30px;
+            padding: 6px 14px;
+            font-size: 0.75rem;
+            color: #bbdef5;
+            cursor: pointer;
+            transition: 0.2s;
+            backdrop-filter: blur(4px);
+            border: 0.5px solid rgba(79, 195, 247, 0.4);
+        }
+        .chip:hover {
+            background: rgba(79, 195, 247, 0.3);
+            color: white;
+        }
+        .typing-mint {
+            display: flex;
+            gap: 6px;
+            padding: 12px 20px;
+            background: rgba(25, 55, 85, 0.7);
+            border-radius: 28px;
+            width: fit-content;
+            border: 1px solid rgba(79, 195, 247, 0.5);
+            backdrop-filter: blur(8px);
+        }
+        .typing-mint span {
+            width: 8px;
+            height: 8px;
+            background: #80deea;
+            border-radius: 50%;
+            display: inline-block;
+            animation: wave 1.3s infinite ease-in-out;
+        }
+        .typing-mint span:nth-child(2) { animation-delay: 0.2s; }
+        .typing-mint span:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes wave {
+            0%,60%,100%{ transform: translateY(0); opacity: 0.5;}
+            30%{ transform: translateY(-6px); opacity: 1;}
+        }
+        .welcome-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(ellipse at 30% 30%, #0b1f2f, #030c17);
+            backdrop-filter: blur(2px);
+            z-index: 200;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.6s cubic-bezier(0.2, 0.9, 0.4, 1.1), visibility 0.6s;
+        }
+        .welcome-overlay.hide-welcome {
+            opacity: 0;
+            visibility: hidden;
+        }
+        .welcome-card {
+            text-align: center;
+            max-width: 460px;
+            padding: 40px 32px;
+            background: rgba(15, 40, 60, 0.55);
+            backdrop-filter: blur(20px);
+            border-radius: 56px;
+            border: 1px solid rgba(79, 195, 247, 0.5);
+            box-shadow: 0 30px 40px -20px black;
+            animation: glowPulse 2.2s infinite;
+        }
+        @keyframes glowPulse {
+            0% { box-shadow: 0 0 0 0 rgba(79, 195, 247, 0.2); border-color: rgba(79,195,247,0.3);}
+            50% { box-shadow: 0 0 0 18px rgba(79, 195, 247, 0); border-color: #4fc3f7;}
+            100% { box-shadow: 0 0 0 0 rgba(79, 195, 247, 0);}
+        }
+        .welcome-logo {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            overflow: hidden;
+            border: 4px solid #4fc3f7;
+        }
+        .welcome-logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .welcome-btn {
+            background: linear-gradient(95deg, #4fc3f7, #0277bd);
+            border: none;
+            padding: 14px 34px;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 48px;
+            color: white;
+            margin-top: 28px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .welcome-btn:hover {
+            transform: scale(1.02);
+            box-shadow: 0 12px 25px -8px #0277bd;
+        }
+        @media (max-width: 700px) {
+            .sidebar { width: 90px; padding: 20px 12px; }
+            .logo-text, .nav-item span { display: none; }
+            .nav-item { justify-content: center; }
+            .logo-area { justify-content: center; }
+            .bubble { max-width: 85%; }
+        }
+        footer {
+            font-size: 10px;
+            text-align: center;
+            color: #437c9e;
+            margin-top: 6px;
+        }
+    </style>
+</head>
+<body>
+<div class="bg-aura"></div>
+<div class="bg-particles" id="particleContainer"></div>
+
+<div class="welcome-overlay" id="welcomeScreen">
+    <div class="welcome-card">
+        <div class="welcome-logo">
+            <img src="IMG_9403.JPG">
+        </div>
+        <h1 style="font-size: 44px; font-weight: 700; background: linear-gradient(130deg,#b3f0ff,#4fc3f7); -webkit-background-clip:text; background-clip:text; color:transparent;">薄荷AI</h1>
+        <p style="margin: 16px 0 8px; color: #cfe9ff;">你的专属啥猫助手</p>
+        <p style="font-size: 0.85rem; color: #95bada;">随时对话-基于智谱AI</p>
+        <button class="welcome-btn" id="startAppBtn">✨ 开启不智慧对话 ✨</button>
+    </div>
+</div>
+
+<div class="app-wrapper" id="appContainer" style="display: none;">
+    <div class="sidebar">
+        <div class="logo-area">
+            <div class="logo-icon">
+                <img src="IMG_9403.JPG">
+            </div>
+            <span class="logo-text">薄荷AI</span>
+        </div>
+        <div class="nav-menu">
+            <div class="nav-item active"><i class="fas fa-comment-dots"></i><span>智能对话</span></div>
+            <div class="nav-item"><i class="fas fa-folder-open"></i><span>文件助手</span></div>
+            <div class="nav-item"><i class="fas fa-palette"></i><span>灵感生成</span></div>
+            <div class="nav-item"><i class="fas fa-cog"></i><span>偏好设置</span></div>
+        </div>
+        <div style="margin-top: auto;">
+            <div class="chip" style="text-align:center;"><i class="fas fa-microchip"></i> 薄荷芯 2.0</div>
+        </div>
+    </div>
+
+    <div class="main-panel">
+        <div class="top-header">
+            <div class="header-title"><i class="fas fa-comment-smile" style="margin-right: 8px;"></i> 薄荷·对话引擎</div>
+            <div class="badge-mint"><i class="fas fa-snowflake"></i> 实时在线 · 极速响应</div>
+        </div>
+        <div class="chat-core" id="chatMessages">
+            <div class="message-row ai">
+                <div class="avatar-mint">
+                    <img src="IMG_9403.JPG">
+                </div>
+                <div class="bubble">🌿 我是薄荷，有什么可以帮你的吗？可可~</div>
+            </div>
+        </div>
+        <div class="input-section">
+            <div class="input-wrapper">
+                <textarea class="message-input" id="userInput" placeholder="输入消息... 按 Enter 发送" rows="1"></textarea>
+                <button class="send-button" id="sendBtn"><i class="fas fa-paper-plane"></i></button>
+            </div>
+            <div class="quick-actions">
+                <div class="chip" data-quick="推荐一本治愈书籍">📖 治愈书单</div>
+                <div class="chip" data-quick="写一首关于夏天的短诗">🌸 夏日诗</div>
+                <div class="chip" data-quick="如何提高专注力？">🧠 专注技巧</div>
+                <div class="chip" data-quick="讲个有趣的笑话">😄 解压笑话</div>
+            </div>
+            <footer>薄荷AI · 每次对话都是思维的清凉 · 基于智谱AI</footer>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ===================== 【必填配置】免费智谱GLM API =====================
+    const API_KEY = "a3f718f93a2545508b12c057c9a0ea37.XDov5VKc9tL9fcX4";
+    const API_URL = "https://open.bigmodel.cn/api/paas/v4/chat/completions";
+    const MODEL = "glm-4-flash";
+    // ======================================================================
+
+    // 身份关键词列表（命中直接固定回复，不走API）
+    const checkWords = ["你是谁","你是什么ai","你是什么AI","你叫什么","你叫什么名字","介绍一下你自己","你是哪个模型"];
+
+    function initParticles() {
+        const container = document.getElementById('particleContainer');
+        for (let i = 0; i < 70; i++) {
+            const p = document.createElement('div');
+            p.classList.add('particle');
+            const size = Math.random() * 5 + 2;
+            p.style.width = size + 'px';
+            p.style.height = size + 'px';
+            p.style.left = Math.random() * 100 + '%';
+            p.style.animationDuration = 12 + Math.random() * 18 + 's';
+            p.style.animationDelay = Math.random() * 12 + 's';
+            p.style.opacity = Math.random() * 0.5;
+            container.appendChild(p);
+        }
+    }
+
+    const chatContainer = document.getElementById('chatMessages');
+    const welcomeScreen = document.getElementById('welcomeScreen');
+    const appContainer = document.getElementById('appContainer');
+    const userInput = document.getElementById('userInput');
+    const sendBtn = document.getElementById('sendBtn');
+    let typingIndicator = null;
+
+    function escapeHtml(str) {
+        return str.replace(/[&<>]/g, m => {
+            if(m === '&') return '&amp;';
+            if(m === '<') return '&lt;';
+            if(m === '>') return '&gt;';
+            return m;
+        }).replace(/\n/g, '<br>');
+    }
+    function formatText(text) {
+        return escapeHtml(text);
+    }
+    function scrollToBottom() {
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+    }
+
+    function addMessage(role, content) {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `message-row ${role}`;
+        if (role === 'ai') {
+            messageDiv.innerHTML = `
+                <div class="avatar-mint">
+                    <img src="IMG_9403.JPG">
+                </div>
+                <div class="bubble">${formatText(content)}</div>
+            `;
+        } else {
+            messageDiv.innerHTML = `
+                <div class="avatar-mint" style="background: linear-gradient(145deg,#4fc3f7,#0b5e7a);display:flex;align-items:center;justify-content:center;color:white;">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div class="bubble">${escapeHtml(content)}</div>
+            `;
+        }
+        chatContainer.appendChild(messageDiv);
+        scrollToBottom();
+    }
+
+    function showTyping() {
+        if (typingIndicator) typingIndicator.remove();
+        const div = document.createElement('div');
+        div.className = 'message-row ai';
+        div.innerHTML = `
+            <div class="avatar-mint">
+                <img src="IMG_9403.JPG">
+            </div>
+            <div class="typing-mint"><span></span><span></span><span></span></div>
+        `;
+        chatContainer.appendChild(div);
+        scrollToBottom();
+        typingIndicator = div;
+    }
+    function hideTyping() {
+        if (typingIndicator) {
+            typingIndicator.remove();
+            typingIndicator = null;
+        }
+    }
+
+    async function sendMessage() {
+        const text = userInput.value.trim();
+        if (!text) return;
+
+        // 先展示用户消息
+        addMessage('user', text);
+        userInput.value = '';
+        userInput.style.height = 'auto';
+
+        // 关键词拦截：询问身份，直接回复，不调用API
+        const lowerText = text.toLowerCase();
+        let isIdentityQuestion = false;
+        for(let word of checkWords){
+            if(lowerText.includes(word)){
+                isIdentityQuestion = true;
+                break;
+            }
+        }
+        if(isIdentityQuestion){
+            setTimeout(()=>{
+                addMessage('ai', '我是薄荷哦 喵~。');
+            }, 400);
+            return;
+        }
+
+        // 非身份问题，正常调用API
+        showTyping();
+        try {
+            const res = await fetch(API_URL, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${API_KEY}`
+                },
+                body: JSON.stringify({
+                    model: MODEL,
+                    messages: [
+                        { role: "user", content: text }
+                    ],
+                    temperature: 0.8
+                })
+            });
+            const data = await res.json();
+            hideTyping();
+            if (data.choices && data.choices.length > 0) {
+                addMessage('ai', data.choices[0].message.content);
+            } else {
+                addMessage('ai', '接口异常，请稍后重试');
+            }
+        } catch (e) {
+            hideTyping();
+            addMessage('ai', '网络错误或API Key无效');
+        }
+    }
+
+    function handleEnter(e) {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            sendMessage();
+        }
+    }
+
+    document.querySelectorAll('.chip[data-quick]').forEach(chip => {
+        chip.addEventListener('click', () => {
+            userInput.value = chip.getAttribute('data-quick');
+            sendMessage();
+        });
+    });
+
+    document.getElementById('startAppBtn').addEventListener('click', () => {
+        welcomeScreen.classList.add('hide-welcome');
+        setTimeout(() => {
+            welcomeScreen.style.display = 'none';
+            appContainer.style.display = 'flex';
+        }, 550);
+    });
+
+    userInput.addEventListener('input', function () {
+        this.style.height = 'auto';
+        this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+    });
+    userInput.addEventListener('keydown', handleEnter);
+    sendBtn.addEventListener('click', sendMessage);
+
+    document.querySelectorAll('.nav-item').forEach(item => {
+        item.addEventListener('click', function(){
+            document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+            this.classList.add('active');
+        });
+    });
+
+    initParticles();
+</script>
+</body>
+</html>
